@@ -9,7 +9,7 @@
 #include "system.h"
 #include "library/vga/vga.h"
 
-ral *display;
+RAL *display;
 
 void init() {
     printf("Hello from Media Computer!\n");
@@ -17,16 +17,13 @@ void init() {
     display->ral_init();
 }
 
-void test() {
-    for (int i = 0; i < 120; ++i) {
-        display->ral_clear();
-        display->ral_draw_box(0 + i, 0 + i, 320 - 2 * i, 240 - 2 * i, 0x07E0);
-//        alt_up_video_dma_draw_string(pixel_buffer, "Green", 160,120,0);
-        usleep(250000);
-    }
+void game() {
+
 }
 
 int main() {
     init();
-    test();
+    while (true) {
+        game();
+    }
 }

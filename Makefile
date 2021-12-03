@@ -31,7 +31,7 @@ MAKEABLE_LIBRARY_ROOT_DIRS :=
 # Generic flags passed to the compiler for different types of input files.
 ALT_CFLAGS :=
 ALT_CXXFLAGS :=
-ALT_CPPFLAGS := -std=c++11
+ALT_CPPFLAGS := -std=c++17
 ALT_ASFLAGS :=
 ALT_LDFLAGS :=
 
