@@ -1,0 +1,6 @@
+[submodule "library/ral"]
+	path = library/ral
+	url = https://github.com/Stressvogel/ral.git
+[submodule "library/vga"]
+	path = library/vga
+	url = https://github.com/Stressvogel/vga.git
