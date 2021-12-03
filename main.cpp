@@ -8,22 +8,23 @@
 #include <unistd.h>
 #include "system.h"
 #include "library/vga/vga.h"
+#include "src/game.h"
 
 RAL *display;
+Game *game;
 
 void init() {
     printf("Hello from Media Computer!\n");
     display = new VGA();
     display->ral_init();
+    game = new Game(display);
 }
 
-void game() {
-
-}
 
 int main() {
     init();
-    while (true) {
-        game();
+    while (game->running) {
+        game->tick();
+        usleep(1000000);
     }
 }
