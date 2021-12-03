@@ -132,3 +132,6 @@ $RECYCLE.BIN/
 *.lnk
 
 obj
+MediaComputerVGAPoC.elf
+MediaComputerVGAPoC.map
+MediaComputerVGAPoC.objdump
