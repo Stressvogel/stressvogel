@@ -4,3 +4,6 @@
 [submodule "library/vga"]
 	path = library/vga
 	url = https://github.com/Stressvogel/vga.git
+[submodule "library/ial"]
+	path = library/ial
+	url = https://github.com/Stressvogel/ial
