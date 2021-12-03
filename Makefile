@@ -178,7 +178,7 @@ CRT0 :=
 SYS_LIB :=
 
 # Define path to the root of the BSP.
-BSP_ROOT_DIR := ../MediaComputer_BSP/
+BSP_ROOT_DIR := ../stressvogel_bsp/
 
 # List of application specific include directories, library_old directories and library_old names
 APP_INCLUDE_DIRS :=
