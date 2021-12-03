@@ -25,6 +25,7 @@ int main() {
     init();
     while (game->running) {
         game->tick();
-        usleep(1000000);
+//        usleep(1000000);
+        usleep(250000);
     }
 }
