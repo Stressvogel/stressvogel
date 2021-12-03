@@ -135,3 +135,6 @@ obj
 MediaComputerVGAPoC.elf
 MediaComputerVGAPoC.map
 MediaComputerVGAPoC.objdump
+
+Makefile
+.settings/
