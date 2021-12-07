@@ -21,7 +21,10 @@ Flappy::~Flappy() {
 }
 
 void Flappy::render(RAL *display) {
-	printf("render flappy at y: %d\n", this->y_coord);
+    uint16_t height = this->height;
+    if (y_coord + height > display->get_height()) {
+        height = display->get_height() - y_coord;
+    }
     display->ral_draw_box(x_coord, y_coord, width, height, color);
 }
 

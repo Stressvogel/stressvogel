@@ -10,7 +10,7 @@
 
 #include "entity.h"
 
-#define FLAPPY_VELOCITY 1.25
+#define FLAPPY_VELOCITY 1.10
 
 class Flappy : public Entity {
 protected:
@@ -19,7 +19,7 @@ protected:
 public:
     Flappy(uint16_t start_x, uint16_t start_y);
 
-    ~Flappy();
+    virtual ~Flappy();
 
     void set_color(uint16_t color);
 

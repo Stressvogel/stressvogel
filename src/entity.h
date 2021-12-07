@@ -15,7 +15,7 @@ protected:
     uint16_t y_coord;
 
 public:
-    virtual ~Entity();
+    virtual ~Entity() = default;
 
     virtual uint16_t get_width() = 0;
 
