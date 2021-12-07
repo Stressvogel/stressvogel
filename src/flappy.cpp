@@ -26,6 +26,19 @@ void Flappy::render(RAL *display) {
         height = display->get_height() - y_coord;
     }
     display->ral_draw_box(x_coord, y_coord, width, height, color);
+
+    uint16_t **sprite;
+    sprite = new uint16_t*[20];
+
+    size_t a = 0;
+    for (int i = 0; i < 20; ++i) {
+    	sprite[i] = new uint16_t[20];
+    	for (int j = 0; j < 20; ++j) {
+    		sprite[i][j] = (a++ % 3 == 0) ? 0x001F : 0x07E0;
+    	}
+    }
+
+    display->ral_draw_sprite(x_coord, y_coord, width, this->height, &sprite);
 }
 
 void Flappy::set_color(uint16_t color) {
