@@ -13,8 +13,10 @@
 #define FLAPPY_VELOCITY 1.10
 
 class Flappy : public Entity {
+private:
+	uint16_t **sprite_buf;
 protected:
-    uint16_t color = 0xFFE0;
+    uint16_t baseline_x;
 
 public:
     Flappy(uint16_t start_x, uint16_t start_y);
@@ -41,7 +43,5 @@ public:
 
     void render(RAL *display);
 };
-
-
 
 #endif /* SOFTWARE_FLAPPY_H_ */

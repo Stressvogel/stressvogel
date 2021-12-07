@@ -5,15 +5,26 @@
  *      Author: Matthijs Bakker
  */
 
-#include "flappy.h"
 #include <cstdio>
 
-Flappy::Flappy(uint16_t start_x, uint16_t start_y) {
+#include "flappy.h"
+#include "sprite.h"
+
+Flappy::Flappy(uint16_t start_x, uint16_t start_y) : baseline_x(start_x) {
+	// Initialize entity member
 	this->x_coord = start_x;
 	this->y_coord = start_y;
-	this->width = 20;
-	this->height = 20;
-	this->color = 0xFFE0;
+	this->width = FLAPPY_SPRITE_WIDTH;
+	this->height = FLAPPY_SPRITE_HEIGHT;
+
+	// Bouw een mutatable sprite buffer in memory zodat we hem naar RAL kunnen sturen
+	this->sprite_buf = new uint16_t*[height];
+	for (int y = 0; y < height; ++y) {
+		this->sprite_buf[y] = new uint16_t[width];
+	    for (int x = 0; x < width; ++x) {
+	    	this->sprite_buf[y][x] = FLAPPY_SPRITE[y][x];
+	    }
+	}
 }
 
 Flappy::~Flappy() {
@@ -21,24 +32,7 @@ Flappy::~Flappy() {
 }
 
 void Flappy::render(RAL *display) {
-    uint16_t height = this->height;
-    if (y_coord + height > display->get_height()) {
-        height = display->get_height() - y_coord;
-    }
-    display->ral_draw_box(x_coord, y_coord, width, height, color);
-
-    uint16_t **sprite;
-    sprite = new uint16_t*[20];
-
-    size_t a = 0;
-    for (int i = 0; i < 20; ++i) {
-    	sprite[i] = new uint16_t[20];
-    	for (int j = 0; j < 20; ++j) {
-    		sprite[i][j] = (a++ % 3 == 0) ? 0x001F : 0x07E0;
-    	}
-    }
-
-    display->ral_draw_sprite(x_coord, y_coord, width, this->height, &sprite);
+    display->ral_draw_sprite(x_coord, y_coord, width, height, &sprite_buf);
 }
 
 void Flappy::set_color(uint16_t color) {
