@@ -15,6 +15,8 @@ protected:
     uint16_t y_coord;
 
 public:
+    virtual ~Entity();
+
     virtual uint16_t get_width() = 0;
 
     virtual uint16_t get_height() = 0;
