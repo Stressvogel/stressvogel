@@ -10,6 +10,10 @@
 #include "library/vga/vga.h"
 #include "src/game.h"
 
+// sterkte met het simpeler maken van deze macro's
+#define SECONDS_TO_US(second)	(second * 1000000)
+#define TICKS_TO_US(fps)		((int)(((float)(1.0f/((float)fps)))*SECONDS_TO_US(1)))
+
 RAL *display;
 Game *game;
 
@@ -24,7 +28,7 @@ void init() {
 int main() {
     init();
     while (game->running) {
-        game->tick();
-        usleep(1000000);
+        game->tick(); // refresh game logic and render to screen
+        usleep(TICKS_TO_US(5)); // zoveel ticks per seconde... hier kun je gwn de float van de heartbeat sensor aan koppelen
     }
 }

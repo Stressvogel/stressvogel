@@ -6,11 +6,15 @@
 #define SOFTWARE_GAME_H
 
 #include "../src/pipe.h"
+#include "../src/flappy.h"
 
 class Game {
 private:
     RAL *display;
+
     Entity *entities[2] = {nullptr, nullptr};
+    Flappy *flappy;
+
     uint16_t path_max_height = 160;
     uint16_t path_min_height = 20;
 
