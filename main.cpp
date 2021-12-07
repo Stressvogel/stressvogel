@@ -28,7 +28,7 @@ void init() {
 int main() {
     init();
     while (game->running) {
-        game->tick();
-        usleep(TICKS_TO_US(5)); // zoveel ticks per seconde... hier kun je gwn de float van de
+        game->tick(); // refresh game logic and render to screen
+        usleep(TICKS_TO_US(5)); // zoveel ticks per seconde... hier kun je gwn de float van de heartbeat sensor aan koppelen
     }
 }
