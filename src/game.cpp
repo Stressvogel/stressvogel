@@ -7,6 +7,9 @@
 #include <cstdio>
 #include <unistd.h>
 
+#define PIPE_VELOCITY -5// pipes bewegen met -10 pixels per tick
+#define PIPE_INTERVAL 160 // elke 100 pixels een nieuwe pipe
+
 Game::Game(RAL *display) {
     this->display = display;
     this->flappy = new Flappy(50, 50);
@@ -18,49 +21,53 @@ void Game::create_pipe() {
 }
 
 void Game::create_pipe(uint16_t path) {
-    Pipe *upper_pipe = new Pipe(true, path, display->get_width(), display->get_height());
-    Pipe *lower_pipe = new Pipe(false, path, display->get_width(), display->get_height());
-
-    entities[0] = upper_pipe;
-    entities[1] = lower_pipe;
+    entities.push_back(new Pipe(true, path, display->get_width(), display->get_height()));
+    entities.push_back(new Pipe(false, path, display->get_width(), display->get_height()));
 }
 
 void Game::tick() {
-    if (entities[0] == nullptr) {
-        create_pipe();
-    } else {
-    	// TODO linked list maken van entities
-        for (uint16_t i = 0; i < 2; ++i) {
-            Entity *entity = entities[i];
-            uint16_t new_x_coord = entity->get_x_coord() - 10;
+	// Maak een nieuwe pipe aan als de laatste pipe X pixels bewogen is
+	if (this->last_pipe <= (display->get_width() - PIPE_INTERVAL)) {
+		this->last_pipe = display->get_width();
+		create_pipe();
+	}
+	this->last_pipe += PIPE_VELOCITY;
 
-            if (new_x_coord == 0) {
-                running = false;
-                continue;
-            }
+	// Verschuif de pipes, en delete ze zodra ze links weg zijn
+	for (std::list<Entity *>::iterator it = entities.begin(); it != entities.end();) {
+		Entity *entity = *it;
+		uint16_t new_x_coord = entity->get_x_coord() + PIPE_VELOCITY;
 
-            entity->set_x_coord(new_x_coord);
-        }
+		// als entity nog binnen het speelveld is
+		if (new_x_coord > 0) {
+			entity->set_x_coord(new_x_coord);
+			++it;
+		} else if (entity->get_width() > 5) {
+			entity->set_width(entity->get_width() + PIPE_VELOCITY);
+			++it;
+		} else {
+			it = entities.erase(it);
+			delete entity;
+		}
+	}
 
-        uint16_t flappy_y = this->flappy->get_y_coord();
-
-        printf("prev y: %d\n", flappy_y);
-        flappy_y *= FLAPPY_VELOCITY;
-        if ((flappy_y + this->flappy->get_height()) >= this->display->get_height()) {
-        	printf("*insert coffin dance music*\n"); // TODO debug, remove
-        	running = false;
-        } else {
-        	this->flappy->set_y_coord(flappy_y);
-        }
-        printf("flappy y: %d\n", flappy_y);
-    }
-    render();
+	// Update flappy bird position and stop game if he touches the ground
+	uint16_t flappy_y = this->flappy->get_y_coord();
+	flappy_y *= FLAPPY_VELOCITY;
+	if ((flappy_y + this->flappy->get_height()) >= this->display->get_height()) {
+		printf("*insert coffin dance music*\n"); // TODO debug, remove
+		running = false;
+	} else {
+		this->flappy->set_y_coord(flappy_y);
+	}
 }
 
 void Game::render() {
     display->ral_clear();
+
     for (Entity *entity : entities) {
         entity->render(display);
     }
+
     this->flappy->render(display);
 }
