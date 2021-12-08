@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include "system.h"
 #include "library/vga/vga.h"
+#include "library/ial/ial_de2_115.h"
 #include "src/game.h"
 
 // sterkte met het simpeler maken van deze macro's
@@ -15,20 +16,28 @@
 #define TICKS_TO_US(fps)		((int)(((float)(1.0f/((float)fps)))*SECONDS_TO_US(1)))
 
 RAL *display;
+ial *input;
 Game *game;
 
 void init() {
-    printf("Hello from Media Computer!\n");
+    printf("Flappy Bird!\n");
+
     display = new VGA();
     display->ral_init();
-    game = new Game(display);
-}
 
+    input = new ial_de2_115();
+    input->ial_init();
+
+    printf("Creating game\n");
+
+    game = new Game(display, input);
+}
 
 int main() {
     init();
 
     while (game->running) {
+    	input->ial_poll();
         game->tick(); // refresh game logic
         game->render(); // render to screen
         usleep(TICKS_TO_US(10)); // zoveel ticks per seconde... hier kun je gwn de float van de heartbeat sensor aan koppelen

@@ -7,12 +7,14 @@
 #include <cstdio>
 #include <unistd.h>
 
-#define PIPE_VELOCITY -5// pipes bewegen met -10 pixels per tick
+#define PIPE_VELOCITY -5 // pipes bewegen met -10 pixels per tick
 #define PIPE_INTERVAL 160 // elke 100 pixels een nieuwe pipe
 
-Game::Game(RAL *display) {
-    this->display = display;
+static void button_pressed_cb(bool is_pressed, void *user_data);
+
+Game::Game(RAL *display, ial *input) : display(display), input(input) {
     this->flappy = new Flappy(50, 150);
+    this->input->ial_register_button_callback(0, 0, &button_pressed_cb, this);
 }
 
 void Game::create_pipe() {
@@ -75,4 +77,12 @@ void Game::render() {
     }
 
     this->flappy->render(display);
+}
+
+Flappy *Game::get_flappy() {
+	return this->flappy;
+}
+
+static void button_pressed_cb(bool is_pressed, void *user_data) {
+	((Game *) user_data)->get_flappy()->velocity = 10;
 }
