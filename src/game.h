@@ -38,6 +38,8 @@ public:
 
     void render();
 
+    void reset();
+
     Flappy *get_flappy();
 };
 

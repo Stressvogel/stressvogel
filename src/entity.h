@@ -7,6 +7,7 @@
 
 #include "../library/ral/ral.h"
 
+
 class Entity {
 protected:
     uint16_t width;

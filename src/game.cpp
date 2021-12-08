@@ -40,7 +40,17 @@ void Game::tick() {
 		Entity *entity = *it;
 		uint16_t new_x_coord = entity->get_x_coord() + PIPE_VELOCITY;
 
-		// als entity nog binnen het speelveld is
+		// als de flappy in aanraking komt met deze pipe
+		if (flappy->get_x_coord() < entity->get_x_coord() + entity->get_width() &&
+		    flappy->get_x_coord() + flappy->get_width() > entity->get_x_coord() &&
+		    flappy->get_y_coord() < entity->get_y_coord() + entity->get_height() &&
+		    flappy->get_y_coord() + flappy->get_height() > entity->get_y_coord()) {
+
+		    this->running = false;
+		    return;
+		}
+
+		// als deze pipe nog binnen het speelveld is
 		if (new_x_coord > 0) {
 			entity->set_x_coord(new_x_coord);
 			++it;
@@ -79,10 +89,28 @@ void Game::render() {
     this->flappy->render(display);
 }
 
+void Game::reset() {
+	for (std::list<Entity *>::iterator it = entities.begin(); it != entities.end();) {
+		Entity *entity = *it;
+		it = entities.erase(it);
+		delete entity;
+	}
+	this->last_pipe = 0;
+	this->flappy->set_x_coord(50);
+	this->flappy->set_y_coord(150);
+	this->running = true;
+}
+
 Flappy *Game::get_flappy() {
 	return this->flappy;
 }
 
 static void button_pressed_cb(bool is_pressed, void *user_data) {
-	((Game *) user_data)->get_flappy()->velocity = 10;
+	Game *game = (Game *) user_data;
+
+	if (game->running) {
+		game->get_flappy()->velocity = 10;
+	} else {
+		game->reset();
+	}
 }
