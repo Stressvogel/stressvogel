@@ -60,9 +60,17 @@ void Flappy::set_height(uint16_t height) {}
 void Flappy::set_width(uint16_t width) {}
 
 void Flappy::set_y_coord(uint16_t y_coord) {
-	this->y_coord = y_coord;
+    this->y_coord = y_coord;
 }
 
 void Flappy::set_x_coord(uint16_t x_coord) {
     this->x_coord = x_coord;
+}
+
+void Flappy::calc_new_velocity() {
+    float new_velocity = velocity - GRAVITY;
+    if (new_velocity <= MAX_SPEED) {
+        new_velocity = MAX_SPEED;
+    }
+    velocity = new_velocity;
 }

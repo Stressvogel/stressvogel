@@ -12,7 +12,7 @@
 
 Game::Game(RAL *display) {
     this->display = display;
-    this->flappy = new Flappy(50, 50);
+    this->flappy = new Flappy(50, 150);
 }
 
 void Game::create_pipe() {
@@ -53,13 +53,18 @@ void Game::tick() {
 
 	// Update flappy bird position and stop game if he touches the ground
 	uint16_t flappy_y = this->flappy->get_y_coord();
-	flappy_y *= FLAPPY_VELOCITY;
+    flappy_y -= flappy->velocity;
 	if ((flappy_y + this->flappy->get_height()) >= this->display->get_height()) {
 		printf("*insert coffin dance music*\n"); // TODO debug, remove
 		running = false;
 	} else {
-		this->flappy->set_y_coord(flappy_y);
-	}
+        if (flappy_y > 200) {
+            flappy_y = 150;
+            flappy->velocity = 10;
+        }
+        this->flappy->set_y_coord(flappy_y);
+        this->flappy->calc_new_velocity();
+    }
 }
 
 void Game::render() {

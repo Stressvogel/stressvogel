@@ -25,14 +25,14 @@ private:
 
     void create_pipe(uint16_t i);
 
-    void render();
-
 public:
     Game(RAL *display);
 
     bool running = true;
 
     void tick();
+
+    void render();
 };
 
 #endif //SOFTWARE_GAME_H
