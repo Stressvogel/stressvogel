@@ -9,7 +9,7 @@ Pipe::~Pipe() {
 }
 
 Pipe::Pipe(bool upper, uint16_t path, uint16_t screen_width, uint16_t screen_height) {
-    width = 60;
+    width = 40;
     x_coord = screen_width - 10;
     if (upper) {
         y_coord = 0;
@@ -23,9 +23,11 @@ Pipe::Pipe(bool upper, uint16_t path, uint16_t screen_width, uint16_t screen_hei
 
 void Pipe::render(RAL *display) {
     uint16_t width = this->width;
+
     if (x_coord + width > display->get_width()) {
         width = display->get_width() - x_coord;
     }
+
     display->ral_draw_box(x_coord, y_coord, width, height, color);
 }
 
@@ -49,7 +51,9 @@ uint16_t Pipe::get_y_coord() {
 
 void Pipe::set_height(uint16_t height) {}
 
-void Pipe::set_width(uint16_t width) {}
+void Pipe::set_width(uint16_t width) {
+	this->width = width;
+}
 
 void Pipe::set_y_coord(uint16_t y_coord) {}
 

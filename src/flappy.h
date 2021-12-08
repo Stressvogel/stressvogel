@@ -9,16 +9,20 @@
 #define SOFTWARE_FLAPPY_H_
 
 #include "entity.h"
+#include <stdlib.h>
 
-#define FLAPPY_VELOCITY 1.10
+#define GRAVITY 1.5
+#define MAX_SPEED -20
 
 class Flappy : public Entity {
 private:
-	uint16_t **sprite_buf;
+    uint16_t **sprite_buf;
 protected:
     uint16_t baseline_x;
 
 public:
+    float velocity = 10;
+
     Flappy(uint16_t start_x, uint16_t start_y);
 
     virtual ~Flappy();
@@ -42,6 +46,8 @@ public:
     void set_x_coord(uint16_t x_coord);
 
     void render(RAL *display);
+
+    void calc_new_velocity();
 };
 
 #endif /* SOFTWARE_FLAPPY_H_ */
