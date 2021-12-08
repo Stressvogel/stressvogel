@@ -9,18 +9,23 @@
 #define SOFTWARE_SPRITE_H_
 
 
-// Basiskleuren
+/* -------------------------------------------------------------------------
+ * Basiskleuren
+ * ------------------------------------------------------------------------- */
 
 #define T 0xDEAD // transparant, wordt niet gerendered.
 //#define B 0x0000 // zwart
 #define B 0x39C8 // zwart-grijs-achtig
 #define W 0xFFFF // wit
 
-// Kleuren voor de flappy bird
+/* -------------------------------------------------------------------------
+ * Kleuren voor de flappy bird
+ * ------------------------------------------------------------------------- */
 
 #define Y 0xFF47 // geel
 #define D 0xFE00 // donkergeel
 #define O 0xFCC0 // oranje
+
 
 #define FLAPPY_SPRITE_HEIGHT 12
 #define FLAPPY_SPRITE_WIDTH 17
