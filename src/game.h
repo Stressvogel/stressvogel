@@ -7,12 +7,16 @@
 
 #include <list>
 
+#include "../library/ial/ial.h"
+#include "../library/ral/ral.h"
+
 #include "../src/pipe.h"
 #include "../src/flappy.h"
 
 class Game {
 private:
     RAL *display;
+    ial *input;
 
     Flappy *flappy;
     std::list<Entity *> entities;
@@ -26,7 +30,7 @@ private:
     void create_pipe(uint16_t i);
 
 public:
-    Game(RAL *display);
+    Game(RAL *display, ial *input);
 
     bool running = true;
 

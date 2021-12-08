@@ -10,9 +10,16 @@
 #define PIPE_VELOCITY -5// pipes bewegen met -10 pixels per tick
 #define PIPE_INTERVAL 160 // elke 100 pixels een nieuwe pipe
 
-Game::Game(RAL *display) {
-    this->display = display;
+static uint8_t presses = 0;
+
+static void button_pressed_cb(bool is_pressed) {
+	printf("TODO knop ingedrukt\n");
+	++presses;
+}
+
+Game::Game(RAL *display, ial *input) : display(display), input(input) {
     this->flappy = new Flappy(50, 150);
+    this->input->ial_register_button_callback(0, 0, &button_pressed_cb);
 }
 
 void Game::create_pipe() {
@@ -58,6 +65,10 @@ void Game::tick() {
 		printf("*insert coffin dance music*\n"); // TODO debug, remove
 		running = false;
 	} else {
+		if (presses) {
+			flappy->velocity = 10;
+			--presses;
+		}
         if (flappy_y > 200) {
             flappy_y = 150;
             flappy->velocity = 10;
