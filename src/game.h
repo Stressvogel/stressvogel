@@ -37,6 +37,8 @@ public:
     void tick();
 
     void render();
+
+    Flappy *get_flappy();
 };
 
 #endif //SOFTWARE_GAME_H
