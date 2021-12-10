@@ -7,10 +7,8 @@
 #include <unistd.h>
 #include "system.h"
 #include "library/vga/vga.h"
-#include "library/ial/ial_de2_115.h"
 #include "src/game.h"
 
-// sterkte met het simpeler maken van deze macro's
 /**
  * Macro voor het converteren van seconden naar microseconden
  *
@@ -23,6 +21,17 @@
  * @param tps		Het aantal ticks per seconden
  **/
 #define TICKS_TO_US(tps)		((int)(((float)(1.0f/((float)tps)))*SECONDS_TO_US(1)))
+
+/**
+ * Switch om makkelijk te schakelen tussen een PS2 keyboard en onboard buttons
+ **/
+#define USE_INPUT_PS2 // comment deze regel uit als je de onboard buttons wilt gebruiken
+
+#ifndef USE_INPUT_PS2
+#include "library/ial/ial_de2_115.h"
+#else
+#include "library/ial/ial_ps2.h"
+#endif
 
 /**
  * Het display waar we naar toe renderen.
@@ -46,7 +55,11 @@ void init() {
     display = new VGA();
     display->ral_init();
 
+#ifdef USE_INPUT_PS2
+    input = new ial_ps2();
+#else
     input = new ial_de2_115();
+#endif
     input->ial_init();
 
     printf("Creating game\n");

@@ -160,6 +160,9 @@ Flappy *Game::get_flappy() {
 static void button_pressed_cb(bool is_pressed, void *user_data) {
 	Game *game = (Game *) user_data;
 
+	// button is losgelaten, doe niks.
+	if (!is_pressed) return;
+
 	if (game->running) {
 		game->get_flappy()->velocity = FLAPPY_LAUNCH_VELOCITY;
 	} else {
