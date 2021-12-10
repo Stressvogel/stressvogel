@@ -141,11 +141,11 @@ const uint16_t GLYPH_7_SPRITE[GLYPH_SPRITE_HEIGHT][GLYPH_SPRITE_WIDTH] = {
 		{B, B, B, B, B, T},
 		{B, W, W, W, B, B},
 		{B, B, B, W, B, B},
-		{B, B, B, W, B, B},
-		{B, B, B, W, B, B},
-		{B, B, B, W, B, B},
-		{B, B, B, B, B, B},
-		{T, B, B, B, B, B},
+		{T, T, B, W, B, B},
+		{T, T, B, W, B, B},
+		{T, T, B, W, B, B},
+		{T, T, B, B, B, B},
+		{T, T, T, B, B, B},
 };
 
 const uint16_t GLYPH_8_SPRITE[GLYPH_SPRITE_HEIGHT][GLYPH_SPRITE_WIDTH] = {
