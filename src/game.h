@@ -12,6 +12,7 @@
 
 #include "../src/pipe.h"
 #include "../src/flappy.h"
+#include "../src/glyph.h"
 
 /**
  * Dit object representeert een gamesessie.
@@ -24,6 +25,8 @@ private:
     Flappy *flappy;
     std::list<Entity *> entities;
     uint16_t last_pipe = 0;
+    uint64_t score = 0;
+    Glyph *score_glyph;
 
     uint16_t path_max_height = 160;
     uint16_t path_min_height = 20;

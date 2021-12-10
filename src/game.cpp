@@ -6,6 +6,9 @@
 #include <cstdlib>
 #include <cstdio>
 #include <unistd.h>
+#include <cmath>
+
+#include "sprite.h"
 
 /**
  * Hoeveel pixels de pipes met elke gametick opschuiven.
@@ -32,6 +35,10 @@
  * De snelheid met waarmee de flappy omhoog gaat zodra er op de button wordt gedrukt.
  **/
 #define FLAPPY_LAUNCH_VELOCITY	10
+/**
+ * De height waarop de score glyph gerendered wordt
+ **/
+#define SCORE_GLYPH_Y			25
 
 /**
  * Welke button we gebruiken.
@@ -43,12 +50,20 @@
 #define BUTTON_PRIORITY			0
 
 /**
+ * Onnauwkeurige division macro
+ */
+#define APPROX_DIV(num, div)	((int) floor(num / div))
+
+/**
  * De callback functie die wordt aangeroepen zodra er button input is.
  **/
 static void button_pressed_cb(bool is_pressed, void *user_data);
 
 Game::Game(RAL *display, ial *input) : display(display), input(input) {
     this->flappy = new Flappy(FLAPPY_START_X, FLAPPY_START_Y);
+    this->score_glyph = new Glyph(APPROX_DIV(display->get_width(), 2) + APPROX_DIV(GLYPH_SPRITE_WIDTH, 3), SCORE_GLYPH_Y, 3);
+    this->score_glyph->show_int((int) 0);
+    this->score = 0;
     this->input->ial_register_button_callback(BUTTON_ID, BUTTON_PRIORITY, &button_pressed_cb, this);
 }
 
@@ -80,6 +95,7 @@ void Game::tick() {
 	this->last_pipe += PIPE_VELOCITY;
 
 	// Verschuif de pipes, en delete ze zodra ze links weg zijn
+	bool crossed_pipe = false;
 	for (std::list<Entity *>::iterator it = entities.begin(); it != entities.end();) {
 		Entity *entity = *it;
 		uint16_t new_x_coord = entity->get_x_coord() + PIPE_VELOCITY;
@@ -102,9 +118,15 @@ void Game::tick() {
 			entity->set_width(entity->get_width() + PIPE_VELOCITY);
 			++it;
 		} else {
+			crossed_pipe = true;
 			it = entities.erase(it);
 			delete entity;
 		}
+	}
+
+	// Verhoog de score als de flappy veilig door een pipe heen is gevlogen
+	if (crossed_pipe) {
+		this->score_glyph->show_int((int) ++score);
 	}
 
 	// Update flappy bird position and stop game if he touches the ground
@@ -130,6 +152,8 @@ void Game::render() {
     }
 
     this->flappy->render(display);
+
+    this->score_glyph->render(display);
 }
 
 /**
@@ -145,6 +169,8 @@ void Game::reset() {
 	this->flappy->set_x_coord(FLAPPY_START_X);
 	this->flappy->set_y_coord(FLAPPY_START_Y);
 	this->running = true;
+	this->score = 0;
+	this->score_glyph->show_int((int) this->score);
 }
 
 /**
