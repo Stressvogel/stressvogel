@@ -26,6 +26,12 @@
 #define D 0xFE00 // donkergeel
 #define O 0xFCC0 // oranje
 
+/*
+ * Kleuren voor de pipes
+ */
+#define G 0x5403
+#define L 0xB6AD
+
 
 #define FLAPPY_SPRITE_HEIGHT 12
 #define FLAPPY_SPRITE_WIDTH 17

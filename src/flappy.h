@@ -11,6 +11,7 @@
 #include "entity.h"
 #include <stdlib.h>
 
+#define STARTING_VELOCITY 10
 #define GRAVITY 1.5
 #define MAX_SPEED -20
 
@@ -30,7 +31,7 @@ public:
     /**
      * De huidige upwards/downwards snelheid van de vogel.
      **/
-    float velocity = 10;
+    float velocity = STARTING_VELOCITY;
 
     Flappy(uint16_t start_x, uint16_t start_y);
 

@@ -9,9 +9,16 @@
 #define ALT_UP_VIDEO_RESAMPLE_RGB_TO_16BIT_RGB(r,g,b)	((b << 11) | (g << 5) | (r << 0))
 #define ALT_UP_VIDEO_RESAMPLE_RGB_30BIT_TO_16BIT(c)		(((c >>  8) & 0x0000F800) | ((c >>  5) & 0x000007E0) | ((c >> 3) & 0x0000001F))
 
+#define PIPE_HEAD_BORDER_SIZE		(1)
+#define PIPE_HEAD_HEIGHT			(18)
+#define PIPE_TAIL_OFFSET			(1 + PIPE_HEAD_BORDER_SIZE)
+#define PIPE_TAIL_BORDER_SIZE		(1)
+#define PIPE_TAIL_GRADIENT_SPLIT_X	(10)
+
+#include <cmath>
+
 #include "pipe.h"
 #include "sprite.h"
-#include <cmath>
 
 Pipe::~Pipe() {}
 
@@ -73,24 +80,57 @@ void Pipe::render(RAL *display) {
         width = display->get_width() - x_coord;
     }
 
-    //display->ral_draw_box(x_coord, y_coord, width, height, color);
+    // Border
+    display->ral_draw_box(x_coord + PIPE_TAIL_OFFSET, y_coord, width - (PIPE_TAIL_OFFSET * 2), height, B);
 
-    /// --- --------- NIEUWE RENDER STUFF ,,, TODO: draw alleen de outlines in de box functie
-
-    display->ral_draw_box(x_coord + 2, y_coord, width - 4, height, B);
-    _ral_draw_hz_gradient(display, x_coord + 2 + 1, y_coord, width - 4 - 2, height, 0x5403, 0xB6AD);
-    _ral_draw_hz_gradient(display, x_coord + 2 + 1, y_coord, width < 10 ? width : 10, height, 0x5403, 0xB6AD);
-    _ral_draw_hz_gradient(display, x_coord + 2 + 1 + 10, y_coord, width - 4 - 2 - 10, height, 0xB6AD, 0x5403);
+    // Gradient links van de split
+    _ral_draw_hz_gradient(
+    		display,
+    		x_coord + PIPE_TAIL_OFFSET + PIPE_TAIL_BORDER_SIZE,
+			y_coord,
+			width < PIPE_TAIL_GRADIENT_SPLIT_X ? width : PIPE_TAIL_GRADIENT_SPLIT_X,
+			height,
+			G,
+			L
+	);
+    // Gradient rechts van de split
+    _ral_draw_hz_gradient(
+    		display,
+    		x_coord + PIPE_TAIL_OFFSET + PIPE_TAIL_BORDER_SIZE + PIPE_TAIL_GRADIENT_SPLIT_X,
+			y_coord,
+			width - (PIPE_TAIL_OFFSET * 2) - (PIPE_TAIL_BORDER_SIZE * 2) - (PIPE_TAIL_GRADIENT_SPLIT_X),
+			height,
+			L,
+			G
+	);
 
     if (upper) {
-     	display->ral_draw_box(x_coord, y_coord + height - 18, width, 18, B);
-    	_ral_draw_hz_gradient(display, x_coord + 1, y_coord + height -18 + 1, width - 2, 18 - 2, 0xB6AD, 0x5403);
-    } else {
-     	display->ral_draw_box(x_coord, y_coord, width, 18, B);
-    	_ral_draw_hz_gradient(display, x_coord + 1, y_coord + 1, width - 2, 18 - 2, 0xB6AD, 0x5403);
-    }
+    	// Teken het hoofd van de pipe onderaan de tail
+     	display->ral_draw_box(x_coord, y_coord + height - PIPE_HEAD_HEIGHT, width, PIPE_HEAD_HEIGHT, B);
 
-    // --------------- END NIEUWE RENDER CODE
+    	_ral_draw_hz_gradient(
+    			display,
+    			x_coord + PIPE_HEAD_BORDER_SIZE,
+				y_coord + height - PIPE_HEAD_HEIGHT + PIPE_HEAD_BORDER_SIZE,
+				width - (PIPE_HEAD_BORDER_SIZE * 2),
+				PIPE_HEAD_HEIGHT - (PIPE_HEAD_BORDER_SIZE * 2),
+				L,
+				G
+		);
+    } else {
+    	// Teken het hoofd van de pipe bovenaan de tail
+     	display->ral_draw_box(x_coord, y_coord, width, PIPE_HEAD_HEIGHT, B);
+
+    	_ral_draw_hz_gradient(
+    			display,
+    			x_coord + PIPE_HEAD_BORDER_SIZE,
+				y_coord + PIPE_HEAD_BORDER_SIZE,
+				width - (PIPE_HEAD_BORDER_SIZE * 2),
+				PIPE_HEAD_HEIGHT - (PIPE_HEAD_BORDER_SIZE * 2),
+				L,
+				G
+		);
+    }
 }
 
 /**

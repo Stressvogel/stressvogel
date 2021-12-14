@@ -10,6 +10,7 @@
 #include <cmath>
 
 #include "sprite.h"
+
 #define LOG_ENABLE
 #include "log.h"
 
@@ -42,6 +43,10 @@
  * De height waarop de score glyph gerendered wordt
  **/
 #define SCORE_GLYPH_Y			25
+/**
+ * De vergroting van de glyph
+ **/
+#define SCORE_GLYPH_SCALE		3
 
 /**
  * Welke button we gebruiken.
@@ -64,7 +69,7 @@ static void button_pressed_cb(bool is_pressed, void *user_data);
 
 Game::Game(RAL *display, ial *input) : display(display), input(input) {
     this->flappy = new Flappy(FLAPPY_START_X, FLAPPY_START_Y);
-    this->score_glyph = new Glyph(APPROX_DIV(display->get_width(), 2) + APPROX_DIV(GLYPH_SPRITE_WIDTH, 3), SCORE_GLYPH_Y, 3);
+    this->score_glyph = new Glyph(APPROX_DIV(display->get_width(), 2) - APPROX_DIV(GLYPH_SPRITE_WIDTH, 1), SCORE_GLYPH_Y, SCORE_GLYPH_SCALE);
     this->score_glyph->show_int((int) 0);
     this->score = 0;
     this->input->ial_register_button_callback(BUTTON_ID, BUTTON_PRIORITY, &button_pressed_cb, this);
@@ -136,13 +141,13 @@ void Game::tick() {
 	uint16_t flappy_y = this->flappy->get_y_coord();
     flappy_y -= flappy->velocity;
 
-	if ((flappy_y + this->flappy->get_height()) >= this->display->get_width()) { // TODO swapfix
+	if ((flappy_y + this->flappy->get_height()) >= this->display->get_height()) { // TODO swapfix
 		LOG_INFO("*insert coffin dance music here*");
 		running = false;
 		if (flappy_y > 9999) {
 			this->flappy->set_y_coord(0); // TODO swapfix
 		} else {
-			this->flappy->set_y_coord(this->display->get_width() - this->flappy->get_height()); // TODO swapfix
+			this->flappy->set_y_coord(this->display->get_height() - this->flappy->get_height()); // TODO swapfix
 		}
 	} else {
         this->flappy->set_y_coord(flappy_y);
