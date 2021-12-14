@@ -3,12 +3,15 @@
 //
 
 #include "game.h"
+
 #include <cstdlib>
 #include <cstdio>
 #include <unistd.h>
 #include <cmath>
 
 #include "sprite.h"
+#define LOG_ENABLE
+#include "log.h"
 
 /**
  * Hoeveel pixels de pipes met elke gametick opschuiven.
@@ -132,9 +135,15 @@ void Game::tick() {
 	// Update flappy bird position and stop game if he touches the ground
 	uint16_t flappy_y = this->flappy->get_y_coord();
     flappy_y -= flappy->velocity;
-	if ((flappy_y + this->flappy->get_height()) >= this->display->get_height()) {
-		printf("*insert coffin dance music*\n"); // TODO debug, remove
+
+	if ((flappy_y + this->flappy->get_height()) >= this->display->get_width()) { // TODO swapfix
+		LOG_INFO("*insert coffin dance music here*");
 		running = false;
+		if (flappy_y > 9999) {
+			this->flappy->set_y_coord(0); // TODO swapfix
+		} else {
+			this->flappy->set_y_coord(this->display->get_width() - this->flappy->get_height()); // TODO swapfix
+		}
 	} else {
         this->flappy->set_y_coord(flappy_y);
         this->flappy->calc_new_velocity();
