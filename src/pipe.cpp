@@ -55,10 +55,6 @@ static void _ral_draw_hz_gradient(RAL *display, uint16_t x, uint16_t y,
 			b_current = b_start;
 
 	for (uint16_t i = 0; i < width; ++i) {
-//		// te traag
-//		for (uint16_t cy = 0; cy < height; ++cy) {
-//			display->ral_draw_pixel(x + i, y + cy, ALT_UP_VIDEO_RESAMPLE_RGB_TO_16BIT_RGB((int)r_current, (int)g_current, (int)b_current));
-//		}
 		display->ral_draw_box(x + i, y, 1, height, ALT_UP_VIDEO_RESAMPLE_RGB_TO_16BIT_RGB((int)r_current, (int)g_current, (int)b_current));
 		r_current += r_increment;
 		g_current += g_increment;
