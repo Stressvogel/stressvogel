@@ -2,11 +2,27 @@
 // Created by Aran on 03/12/2021.
 //
 
+#define ALT_UP_VIDEO_RESAMPLE_RGB_16BIT_EXTRACT_R(c)	((c >> 11) & 0x1F)
+#define ALT_UP_VIDEO_RESAMPLE_RGB_16BIT_EXTRACT_G(c)	((c >>  5) & 0x3F)
+#define ALT_UP_VIDEO_RESAMPLE_RGB_16BIT_EXTRACT_B(c)	((c >>  0) & 0x1F)
+#define ALT_UP_VIDEO_RESAMPLE_RGB_TO_30BIT_RGB(r,g,b)	((r << 20) | (g << 10) | (b << 0))
+#define ALT_UP_VIDEO_RESAMPLE_RGB_TO_16BIT_RGB(r,g,b)	((b << 11) | (g << 5) | (r << 0))
+#define ALT_UP_VIDEO_RESAMPLE_RGB_30BIT_TO_16BIT(c)		(((c >>  8) & 0x0000F800) | ((c >>  5) & 0x000007E0) | ((c >> 3) & 0x0000001F))
+
+#define PIPE_HEAD_BORDER_SIZE		(1)
+#define PIPE_HEAD_HEIGHT			(18)
+#define PIPE_TAIL_OFFSET			(1 + PIPE_HEAD_BORDER_SIZE)
+#define PIPE_TAIL_BORDER_SIZE		(1)
+#define PIPE_TAIL_GRADIENT_SPLIT_X	(10)
+
+#include <cmath>
+
 #include "pipe.h"
+#include "sprite.h"
 
 Pipe::~Pipe() {}
 
-Pipe::Pipe(bool upper, uint16_t path, uint16_t screen_width, uint16_t screen_height) {
+Pipe::Pipe(bool upper, uint16_t path, uint16_t screen_width, uint16_t screen_height) : upper(upper) {
     width = PIPE_WIDTH;
     x_coord = screen_width + (PIPE_START_X_RELATIVE);
 
@@ -20,6 +36,39 @@ Pipe::Pipe(bool upper, uint16_t path, uint16_t screen_width, uint16_t screen_hei
     }
 }
 
+#define CHECK_INTEGER_OVERFLOW(val)	(val = (val > 9999 ? 0 : val))
+
+static void _ral_draw_hz_gradient(RAL *display, uint16_t x, uint16_t y,
+		uint16_t width, uint16_t height, uint16_t start_color, uint16_t end_color) {
+
+	CHECK_INTEGER_OVERFLOW(width);
+	CHECK_INTEGER_OVERFLOW(height);
+	CHECK_INTEGER_OVERFLOW(x);
+	CHECK_INTEGER_OVERFLOW(y);
+
+	// We moeten R, G, B splitsen...
+
+	float	r_start = ALT_UP_VIDEO_RESAMPLE_RGB_16BIT_EXTRACT_R(start_color),
+		 	g_start = ALT_UP_VIDEO_RESAMPLE_RGB_16BIT_EXTRACT_G(start_color),
+			b_start = ALT_UP_VIDEO_RESAMPLE_RGB_16BIT_EXTRACT_B(start_color),
+			r_end = ALT_UP_VIDEO_RESAMPLE_RGB_16BIT_EXTRACT_R(end_color),
+		 	g_end = ALT_UP_VIDEO_RESAMPLE_RGB_16BIT_EXTRACT_G(end_color),
+			b_end = ALT_UP_VIDEO_RESAMPLE_RGB_16BIT_EXTRACT_B(end_color);
+	float	r_increment = ((r_end - r_start) / width),
+			g_increment = ((g_end - g_start) / width),
+			b_increment = ((b_end - b_start) / width),
+			r_current = r_start,
+			g_current = g_start,
+			b_current = b_start;
+
+	for (uint16_t i = 0; i < width; ++i) {
+		display->ral_draw_box(x + i, y, 1, height, ALT_UP_VIDEO_RESAMPLE_RGB_TO_16BIT_RGB((int)r_current, (int)g_current, (int)b_current));
+		r_current += r_increment;
+		g_current += g_increment;
+		b_current += b_increment;
+	}
+}
+
 /**
  * @inheritDoc
  **/
@@ -31,7 +80,57 @@ void Pipe::render(RAL *display) {
         width = display->get_width() - x_coord;
     }
 
-    display->ral_draw_box(x_coord, y_coord, width, height, color);
+    // Border
+    display->ral_draw_box(x_coord + PIPE_TAIL_OFFSET, y_coord, width - (PIPE_TAIL_OFFSET * 2), height, B);
+
+    // Gradient links van de split
+    _ral_draw_hz_gradient(
+    		display,
+    		x_coord + PIPE_TAIL_OFFSET + PIPE_TAIL_BORDER_SIZE,
+			y_coord,
+			width < PIPE_TAIL_GRADIENT_SPLIT_X ? width : PIPE_TAIL_GRADIENT_SPLIT_X,
+			height,
+			G,
+			L
+	);
+    // Gradient rechts van de split
+    _ral_draw_hz_gradient(
+    		display,
+    		x_coord + PIPE_TAIL_OFFSET + PIPE_TAIL_BORDER_SIZE + PIPE_TAIL_GRADIENT_SPLIT_X,
+			y_coord,
+			width - (PIPE_TAIL_OFFSET * 2) - (PIPE_TAIL_BORDER_SIZE * 2) - (PIPE_TAIL_GRADIENT_SPLIT_X),
+			height,
+			L,
+			G
+	);
+
+    if (upper) {
+    	// Teken het hoofd van de pipe onderaan de tail
+     	display->ral_draw_box(x_coord, y_coord + height - PIPE_HEAD_HEIGHT, width, PIPE_HEAD_HEIGHT, B);
+
+    	_ral_draw_hz_gradient(
+    			display,
+    			x_coord + PIPE_HEAD_BORDER_SIZE,
+				y_coord + height - PIPE_HEAD_HEIGHT + PIPE_HEAD_BORDER_SIZE,
+				width - (PIPE_HEAD_BORDER_SIZE * 2),
+				PIPE_HEAD_HEIGHT - (PIPE_HEAD_BORDER_SIZE * 2),
+				L,
+				G
+		);
+    } else {
+    	// Teken het hoofd van de pipe bovenaan de tail
+     	display->ral_draw_box(x_coord, y_coord, width, PIPE_HEAD_HEIGHT, B);
+
+    	_ral_draw_hz_gradient(
+    			display,
+    			x_coord + PIPE_HEAD_BORDER_SIZE,
+				y_coord + PIPE_HEAD_BORDER_SIZE,
+				width - (PIPE_HEAD_BORDER_SIZE * 2),
+				PIPE_HEAD_HEIGHT - (PIPE_HEAD_BORDER_SIZE * 2),
+				L,
+				G
+		);
+    }
 }
 
 /**

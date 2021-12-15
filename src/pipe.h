@@ -27,6 +27,9 @@ private:
      * De hoogte van de opening in vergelijking met Y=0.
      **/
     uint16_t path_height = 60;
+
+    bool upper;
+
 protected:
     /**
      * De kleur van de pipe.

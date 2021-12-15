@@ -1,25 +1,26 @@
 /*
- * flappy.h
+ * glyph.h
  *
- *  Created on: Dec 3, 2021
+ *  Created on: Dec 10, 2021
  *      Author: Matthijs Bakker
  */
 
-#ifndef SOFTWARE_FLAPPY_H_
-#define SOFTWARE_FLAPPY_H_
+#ifndef SOFTWARE_GLYPH_H_
+#define SOFTWARE_GLYPH_H_
 
 #include "entity.h"
 #include <stdlib.h>
 
-#define STARTING_VELOCITY 10
-#define GRAVITY 1.5
-#define MAX_SPEED -20
-
 /**
- * Een flappy bird entity, het hoofdkarakter van de game.
+ * Een letter of nummer die verbonden is aan een sprite.
  **/
-class Flappy : public Entity {
+class Glyph : public Entity {
 private:
+	/**
+	 * De upscale factor van de sprite
+	 **/
+	uint8_t scale;
+
 	/**
 	 * Een mutable buffer met de sprite data.<br/>
 	 * <br/>
@@ -28,14 +29,13 @@ private:
     uint16_t **sprite_buf;
 
 public:
-    /**
-     * De huidige upwards/downwards snelheid van de vogel.
-     **/
-    float velocity = STARTING_VELOCITY;
+    Glyph(uint16_t x, uint16_t y, uint8_t scale);
 
-    Flappy(uint16_t start_x, uint16_t start_y);
+    virtual ~Glyph();
 
-    virtual ~Flappy();
+    void show_int(char new_char);
+
+    void show_int(int new_int);
 
     /**
      * @inheritDoc
@@ -81,13 +81,6 @@ public:
      * @inheritDoc
      **/
     void render(RAL *display);
-
-    /**
-     * Bereken de nieuwe velocity.<br/>
-     * <br/>
-     * De velocity zal afnemen omdat de zwaartekracht er invloed op heeft.
-     **/
-    void calc_new_velocity();
 };
 
-#endif /* SOFTWARE_FLAPPY_H_ */
+#endif /* SOFTWARE_GLYPH_H_ */

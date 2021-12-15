@@ -88,6 +88,7 @@ void Flappy::set_y_coord(uint16_t y_coord) {
  **/
 void Flappy::set_x_coord(uint16_t x_coord) {
     this->x_coord = x_coord;
+    this->velocity = STARTING_VELOCITY;
 }
 
 /**
