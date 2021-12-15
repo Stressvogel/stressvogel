@@ -17,6 +17,7 @@
 //#define B 0x0000 // zwart
 #define B 0x39C8 // zwart-grijs-achtig
 #define W 0xFFFF // wit
+#define R 0xF800 // rood
 
 /* -------------------------------------------------------------------------
  * Kleuren voor de flappy bird
@@ -26,9 +27,9 @@
 #define D 0xFE00 // donkergeel
 #define O 0xFCC0 // oranje
 
-/*
+/* -------------------------------------------------------------------------
  * Kleuren voor de pipes
- */
+ * ------------------------------------------------------------------------- */
 #define G 0x5403
 #define L 0xB6AD
 
@@ -56,6 +57,18 @@ const uint16_t FLAPPY_SPRITE[FLAPPY_SPRITE_HEIGHT][FLAPPY_SPRITE_WIDTH] = {
 		{T, T, T, T, T, B, B, O, O, O, O, B, B, B, B, B, T},
 		{T, T, T, T, T, T, T, B, B, B, B, T, T, T, T, T, T},
 };
+
+/**
+ * Teken een collision box om een bepaalde regio.
+ **/
+#define DRAW_HITBOX(display_ptr, x, y, width, height) \
+	(display_ptr->ral_draw_box(x, y, width, height, 0xF800, false))
+
+/**
+ * Teken een collision box om een bepaalde regio als <b>cond</b> waar is.
+ **/
+#define DRAW_HITBOX_IF(cond, display_ptr, x, y, width, height) \
+	{if (cond) {(DRAW_HITBOX(display_ptr, x, y, width, height));}}
 
 #define GLYPH_SPRITE_HEIGHT 8
 #define GLYPH_SPRITE_WIDTH 6

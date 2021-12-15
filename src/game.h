@@ -46,7 +46,14 @@ private:
 public:
     Game(RAL *display, ial *input);
 
+    /**
+     * Of de bird alive is.
+     **/
     bool running = true;
+    /**
+     * Of de collision boundaries worden gerenderd.
+     **/
+    bool show_hitboxes = false;
 
     /**
      * Verwerk de input en update de game state.

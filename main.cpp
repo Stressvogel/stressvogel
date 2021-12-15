@@ -60,6 +60,8 @@
  **/
 #define GAME_TICKS				TPS_TO_TICKS(TPS)
 
+#define LOG_INIT_MSG(component)	(LOG_INFO(component " is geinitialiseerd"))
+
 /**
  * Het display waar we naar toe renderen.
  **/
@@ -75,14 +77,18 @@ static Game *game;
 
 static alt_alarm game_tick;
 
+// In de documentation van alt_alarm staat dat de callback methode
+// in interrupt context wordt uitgevoerd, maar for some reason
+// deze wordt gewoon in user context uitgevoerd... prima voor ons
 alt_u32 game_tick_cb(void *) {
+	// Check voor nieuwe input
 	input->ial_poll();
 
 	// If game is running
 	if (game->running) {
 		game->tick(); // refresh game logic
-		game->render(); // render to screen
 	}
+	game->render(); // render to screen
 
 	return GAME_TICKS;
 }
@@ -93,6 +99,7 @@ alt_u32 game_tick_cb(void *) {
 void init() {
     display = new VGA();
     display->ral_init();
+    LOG_INIT_MSG("Display");
 
 #ifdef USE_INPUT_PS2
     input = new ial_ps2();
@@ -102,9 +109,10 @@ void init() {
     LOG_INFO("Onboard DE2_115 buttons worden als input gebruikt");
 #endif
     input->ial_init();
+    LOG_INIT_MSG("Input");
 
     game = new Game(display, input);
-    LOG_INFO("Game is geinitialiseerd");
+    LOG_INIT_MSG("Game");
 }
 
 
@@ -112,7 +120,7 @@ void init() {
  * Het entry point van ons programma
  **/
 int main() {
-	LOG_INFO("Game wordt geinitialiseerd");
+	LOG_INFO("Flappy Bird wordt gestart...");
 
 	// Initialiseer de randapparaten en de game
     init();

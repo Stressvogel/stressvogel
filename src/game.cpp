@@ -49,9 +49,13 @@
 #define SCORE_GLYPH_SCALE		3
 
 /**
- * Welke button we gebruiken.
+ * Welke button we gebruiken om de bird te laten vliegen
  **/
-#define BUTTON_ID				0
+#define FLY_BUTTON_ID			0
+/**
+ * Welke button we gebruiken om collision borders te toggelen
+ **/
+#define HITBOX_BUTTON_ID		10
 /**
  * Welke priority onze callback heeft binnen IAL.
  **/
@@ -63,16 +67,23 @@
 #define APPROX_DIV(num, div)	((int) floor(num / div))
 
 /**
- * De callback functie die wordt aangeroepen zodra er button input is.
+ * Een callback functie die wordt aangeroepen zodra er button input is.
  **/
-static void button_pressed_cb(bool is_pressed, void *user_data);
+static void fly_button_pressed_cb(bool is_pressed, void *user_data),
+			hitbox_button_pressed_cb(bool is_pressed, void *user_data);
 
 Game::Game(RAL *display, ial *input) : display(display), input(input) {
+	// Initialiseer de flappy bird en plaats hem op de startpositie
     this->flappy = new Flappy(FLAPPY_START_X, FLAPPY_START_Y);
+
+    // Initialiseer de score glyph
     this->score_glyph = new Glyph(APPROX_DIV(display->get_width(), 2) - APPROX_DIV(GLYPH_SPRITE_WIDTH, 1), SCORE_GLYPH_Y, SCORE_GLYPH_SCALE);
     this->score_glyph->show_int((int) 0);
     this->score = 0;
-    this->input->ial_register_button_callback(BUTTON_ID, BUTTON_PRIORITY, &button_pressed_cb, this);
+
+    // Registreer button callbacks in de IAL
+    this->input->ial_register_button_callback(FLY_BUTTON_ID, BUTTON_PRIORITY, &fly_button_pressed_cb, this);
+    this->input->ial_register_button_callback(HITBOX_BUTTON_ID, BUTTON_PRIORITY, &hitbox_button_pressed_cb, this);
 }
 
 /**
@@ -159,15 +170,17 @@ void Game::tick() {
  * @inheritDoc
  **/
 void Game::render() {
-    for (Entity *entity : entities) {
-        entity->render(display);
+    for (Entity *entity : this->entities) {
+        entity->render(this->display);
+        DRAW_HITBOX_IF(this->show_hitboxes, this->display, entity->get_x_coord(), entity->get_y_coord(), entity->get_width(), entity->get_height());
     }
 
-    this->flappy->render(display);
+    this->flappy->render(this->display);
+    DRAW_HITBOX_IF(this->show_hitboxes, this->display, flappy->get_x_coord(), flappy->get_y_coord(), flappy->get_width(), flappy->get_height());
 
-    this->score_glyph->render(display);
+    this->score_glyph->render(this->display);
 
-    display->ral_clear();
+    this->display->ral_clear();
 }
 
 /**
@@ -197,15 +210,28 @@ Flappy *Game::get_flappy() {
 /**
  * @inheritDoc
  **/
-static void button_pressed_cb(bool is_pressed, void *user_data) {
+static void fly_button_pressed_cb(bool is_pressed, void *user_data) {
 	Game *game = (Game *) user_data;
 
-	// button is losgelaten, doe niks.
+	// Button is ingedrukt, doe niks.
 	if (!is_pressed) return;
 
+	// Als de game loopt, laat de bird vliegen.
+	// Als de game voorbij is, reset de game.
 	if (game->running) {
 		game->get_flappy()->velocity = FLAPPY_LAUNCH_VELOCITY;
 	} else {
 		game->reset();
 	}
+}
+
+
+/**
+ * @inheritDoc
+ **/
+static void hitbox_button_pressed_cb(bool is_pressed, void *user_data) {
+	// Button is ingedrukt, doe niks.
+	if (!is_pressed) return;
+
+	((Game *) user_data)->show_hitboxes ^= true;
 }
