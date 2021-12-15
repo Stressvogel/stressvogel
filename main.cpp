@@ -15,7 +15,7 @@
 /**
  * Switch om makkelijk te schakelen tussen een PS2 keyboard en onboard buttons
  **/
-//#define USE_INPUT_PS2 // comment deze regel uit als je de onboard buttons wilt gebruiken
+#define USE_INPUT_PS2 // comment deze regel uit als je de onboard buttons wilt gebruiken
 
 #ifndef USE_INPUT_PS2
 #include "library/ial/ial_de2_115.h"
@@ -106,6 +106,7 @@ void init() {
     game = new Game(display, input);
     LOG_INFO("Game is geinitialiseerd");
 }
+
 
 /**
  * Het entry point van ons programma

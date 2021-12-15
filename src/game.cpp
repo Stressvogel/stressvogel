@@ -159,8 +159,6 @@ void Game::tick() {
  * @inheritDoc
  **/
 void Game::render() {
-    display->ral_clear();
-
     for (Entity *entity : entities) {
         entity->render(display);
     }
@@ -168,6 +166,8 @@ void Game::render() {
     this->flappy->render(display);
 
     this->score_glyph->render(display);
+
+    display->ral_clear();
 }
 
 /**
