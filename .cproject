@@ -43,15 +43,6 @@
 		<project id="MediaComputerVGAPoC.null.763286696" name="MediaComputerVGAPoC"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.1582247775;preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.1582247775.;altera.tool.gnu.c.compiler.mingw.2077385324;cdt.managedbuild.tool.gnu.c.compiler.input.1218958777">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.1582247775;preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.1582247775.;altera.tool.gnu.cpp.compiler.mingw.1489690998;cdt.managedbuild.tool.gnu.cpp.compiler.input.1920973160">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets>
 			<target name="mem_init_install" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
@@ -84,5 +75,14 @@
 		<configuration configurationName="Nios II">
 			<resource resourceType="PROJECT" workspacePath="/MediaComputerVGAPoC"/>
 		</configuration>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.1903352455;preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.1903352455.;altera.tool.gnu.c.compiler.mingw.1343856297;cdt.managedbuild.tool.gnu.c.compiler.input.114119137">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.1903352455;preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.1903352455.;altera.tool.gnu.cpp.compiler.mingw.1205154981;cdt.managedbuild.tool.gnu.cpp.compiler.input.1550761509">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 	</storageModule>
 </cproject>

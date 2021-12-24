@@ -2,14 +2,11 @@
 // Created by Aran on 30/11/2021.
 //
 
+#include <chrono>
 #include <cstdio>
 #include <unistd.h>
 
-#include "alt_types.h"
 #include "system.h"
-#include "sys/alt_alarm.h"
-#include "altera_avalon_timer.h"
-#include "sys/alt_irq.h"
 
 #include "library/vga/vga.h"
 #include "src/game.h"
@@ -17,7 +14,7 @@
 /**
  * Switch om makkelijk te schakelen tussen een PS2 keyboard en onboard buttons
  **/
-//#define USE_INPUT_PS2 // comment deze regel uit als je de onboard buttons wilt gebruiken
+#define USE_INPUT_PS2 // comment deze regel uit als je de onboard buttons wilt gebruiken
 
 #ifndef USE_INPUT_PS2
 
@@ -28,11 +25,6 @@
 #include "library/ial/ial_ps2.h"
 
 #endif
-
-/**
- * Switch om logging aan/uit te zetten
- **/
-#define LOG_ENABLE // comment deze regel uit als je logging niet wilt gebruiken
 
 #include "src/log.h"
 
@@ -66,7 +58,14 @@
  **/
 #define GAME_TICKS                TPS_TO_TICKS(TPS)
 
-#define LOG_INIT_MSG(component)    (LOG_INFO(component " is geinitialiseerd"))
+/**
+ * De tijd wanneer het computer systeem gegenereerd was
+ **/
+#ifdef SYSID_TIMESTAMP // media computer
+static const time_t HARDWARE_GEN_TIME = SYSID_TIMESTAMP;
+#else // ons computersysteem
+static const time_t HARDWARE_GEN_TIME = SYSID_QSYS_0_TIMESTAMP;
+#endif
 
 /**
  * Het display waar we naar toe renderen.
@@ -81,85 +80,63 @@ static ial *input;
  **/
 static Game *game;
 
-static alt_alarm game_tick;
-
-// In de documentation van alt_alarm staat dat de callback methode
-// in interrupt context wordt uitgevoerd, maar for some reason
-// deze wordt gewoon in user context uitgevoerd... prima voor ons
-void game_tick_cb(void *, alt_u32 ignored) {
-    // Check voor nieuwe input
-    input->ial_poll();
-
-    // If game is running
-    if (game->running) {
-        game->tick(); // refresh game logic
-    }
-    game->render(); // render to screen
-}
-
 /**
  * De functie die de randapparaten opent en de game initialiseert.
  **/
 void init() {
-    display = new VGA();
-    display->ral_init();
-    LOG_INIT_MSG("Display");
+	display = new VGA();
+	display->ral_init();
+	LOG_INIT_MSG("Display");
 
 #ifdef USE_INPUT_PS2
-    input = new ial_ps2();
-    LOG_INFO("PS2 toetsenbord wordt als input gebruikt");
+	input = new ial_ps2();
+	LOG_INFO("PS2 toetsenbord wordt als input gebruikt");
 #else
-    input = new ial_de2_115();
-    LOG_INFO("Onboard DE2_115 buttons worden als input gebruikt");
+	input = new ial_de2_115();
+	LOG_INFO("Onboard DE2_115 buttons worden als input gebruikt");
 #endif
-    input->ial_init();
-    LOG_INIT_MSG("Input");
+	input->ial_init();
+	LOG_INIT_MSG("Input");
 
-    game = new Game(display, input);
-    LOG_INIT_MSG("Game");
+	game = new Game(display, input);
+	LOG_INIT_MSG("Game");
 }
 
-void start_timer_irq() {
-    alt_avalon_timer_sc_init((void *) INTERVAL_TIMER_BASE,
-                             INTERVAL_TIMER_IRQ_INTERRUPT_CONTROLLER_ID,
-                             INTERVAL_TIMER_IRQ,
-                             INTERVAL_TIMER_FREQ);
+void iter() {
+	LOG_MEASURE(input->ial_poll());
 
-    // zie pagina 47 van de DE2-115 computer manual !!!!!!!!
-    // daar gebruiken ze niet alt_irq_* maar doen ze alles handmatig.
-    // nogsteeds handig om ff te lezen wat daar staat
+	// If game is running
+	if (game->running) {
+		LOG_MEASURE(game->tick()); // refresh game logic
+	}
+	LOG_MEASURE(game->render()); // render to screen
+}
 
-    // we gebruiken geen context maar ok.
-    static unsigned int __isr_context;
-    void *isr_context_ptr = (void *) &__isr_context;
-
-    // registreer de interrupt service handler
-    alt_irq_register(INTERVAL_TIMER_IRQ, isr_context_ptr, game_tick_cb);
-
-    // enable de interrupt
-    alt_irq_enable(INTERVAL_TIMER_IRQ);
+void loop() {
+	// Onze game gaat eindeloos door..... totdat iemand de stroom er uit trekt.
+	while (1) {
+		LOG_MEASURE(iter());
+		LOG_INFO("\n\n\n");
+	}
 }
 
 /**
  * Het entry point van ons programma
  **/
 int main() {
-    LOG_INFO("Flappy Bird wordt gestart...");
+	LOG_INFO("Stressvogel op CPU %s\n\tHW datum %s\tSW datum %s",
+			ALT_CPU_NAME,
+			ctime(&HARDWARE_GEN_TIME),
+			__TIMESTAMP__);
 
-    // Initialiseer de randapparaten en de game
-    init();
+	// Initialiseer de randapparaten en de game
+	init();
 
+	// Eindeloze loop
+	loop();
 
-    start_timer_irq();
-//    // Start de gametick timer
-//    if (alt_alarm_start(&game_tick, GAME_TICKS, game_tick_cb, NULL) < 0) {
-//    	LOG_ERROR("Fout met initialiseren van systeemklok");
-//    }
+	LOG_ERROR("Game loop is onderbroken");
 
-    LOG_INFO("Game tick is gestart");
-
-    // Onze game gaat eindeloos door..... totdat iemand de stroom er uit trekt.
-    while (1);
-    return 0;
+	return 0;
 }
 

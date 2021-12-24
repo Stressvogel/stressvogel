@@ -11,7 +11,6 @@
 
 #include "sprite.h"
 
-#define LOG_ENABLE
 #include "log.h"
 
 /**
@@ -170,17 +169,17 @@ void Game::tick() {
  * @inheritDoc
  **/
 void Game::render() {
-    for (Entity *entity : this->entities) {
+    LOG_MEASURE(for (Entity *entity : this->entities) {
         entity->render(this->display);
         DRAW_HITBOX_IF(this->show_hitboxes, this->display, entity->get_x_coord(), entity->get_y_coord(), entity->get_width(), entity->get_height());
-    }
+    });
 
-    this->flappy->render(this->display);
+    LOG_MEASURE(this->flappy->render(this->display));
     DRAW_HITBOX_IF(this->show_hitboxes, this->display, flappy->get_x_coord(), flappy->get_y_coord(), flappy->get_width(), flappy->get_height());
 
-    this->score_glyph->render(this->display);
+    LOG_MEASURE(this->score_glyph->render(this->display));
 
-    this->display->ral_clear();
+    LOG_MEASURE(this->display->ral_clear());
 }
 
 /**
