@@ -8,7 +8,7 @@
 
 #include "system.h"
 
-#include "library/vga/vga.h"
+#include "library/ral/ral_display_vga.h"
 #include "src/game.h"
 
 /**
@@ -18,11 +18,11 @@
 
 #ifndef USE_INPUT_PS2
 
-#include "library/ial/ial_de2_115.h"
+#include "library/ial/ial_device_de2_115.h"
 
 #else
 
-#include "library/ial/ial_ps2.h"
+#include "library/ial/ial_device_ps2.h"
 
 #endif
 
@@ -70,11 +70,11 @@ static const time_t HARDWARE_GEN_TIME = SYSID_QSYS_0_TIMESTAMP;
 /**
  * Het display waar we naar toe renderen.
  **/
-static RAL *display;
+static ral::display *display;
 /**
  * Het device wat we als invoerapparaat gebruiken.
  **/
-static ial *input;
+static ial::device *input;
 /**
  * De gamesessie.
  **/
@@ -84,18 +84,18 @@ static Game *game;
  * De functie die de randapparaten opent en de game initialiseert.
  **/
 void init() {
-	display = new VGA();
-	display->ral_init();
+	display = new ral::display_vga();
+	display->init();
 	LOG_INIT_MSG("Display");
 
 #ifdef USE_INPUT_PS2
-	input = new ial_ps2();
+	input = new ial::device_ps2();
 	LOG_INFO("PS2 toetsenbord wordt als input gebruikt");
 #else
-	input = new ial_de2_115();
+	input = new ial::device_de2_115();
 	LOG_INFO("Onboard DE2_115 buttons worden als input gebruikt");
 #endif
-	input->ial_init();
+	input->init();
 	LOG_INIT_MSG("Input");
 
 	game = new Game(display, input);
@@ -103,7 +103,7 @@ void init() {
 }
 
 void iter() {
-	LOG_MEASURE(input->ial_poll());
+	LOG_MEASURE(input->poll());
 
 	// If game is running
 	if (game->running) {

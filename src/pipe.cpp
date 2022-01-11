@@ -25,20 +25,20 @@
 /**
  * Functie die een horizontale gradient tekent.
  **/
-static void _ral_draw_hz_gradient(RAL *display, uint16_t x, uint16_t y,
+static void _ral_draw_hz_gradient(ral::display *display, uint16_t x, uint16_t y,
 		uint16_t width, uint16_t height, uint16_t start_color, uint16_t end_color);
 
 Pipe::Pipe(bool upper, uint16_t path, uint16_t screen_width, uint16_t screen_height) : upper(upper) {
-    width = PIPE_WIDTH;
-    x_coord = screen_width + (PIPE_START_X_RELATIVE);
+    this->width = PIPE_WIDTH;
+    this->x_coord = screen_width + (PIPE_START_X_RELATIVE);
 
     // Is deze pipe bovenaan of onderaan het scherm gespawned?
     if (upper) {
-        y_coord = 0;
-        height = path;
+    	this->y_coord = 0;
+    	this->height = path;
     } else {
-        y_coord = path + path_height;
-        height = screen_height - y_coord;
+    	this->y_coord = path + this->path_height;
+    	this->height = screen_height - this->y_coord;
     }
 }
 
@@ -47,48 +47,61 @@ Pipe::~Pipe() {}
 /**
  * @inheritDoc
  **/
-void Pipe::render(RAL *display) {
+void Pipe::render(ral::display *display) {
     // Voorkom dat een deel van de rechterkant van de pipe naast het scherm wordt getekend
     uint16_t width = this->width;
-    if (x_coord + width > display->get_width()) {
-        width = display->get_width() - x_coord;
+    if (this->x_coord + width > display->get_width()) {
+        width = display->get_width() - this->x_coord;
     }
 
     // Tail border
-    display->ral_draw_box(x_coord + PIPE_TAIL_OFFSET, y_coord, width - (PIPE_TAIL_OFFSET * 2), height, B, false);
+    display->draw_box(
+    		this->x_coord + PIPE_TAIL_OFFSET,
+			this->y_coord, width - (PIPE_TAIL_OFFSET * 2),
+			this->height,
+			B,
+			false
+	);
 
     // Tail gradient links van de split
     _ral_draw_hz_gradient(
     		display,
-    		x_coord + PIPE_TAIL_OFFSET + PIPE_TAIL_BORDER_SIZE,
-			y_coord,
+			this->x_coord + PIPE_TAIL_OFFSET + PIPE_TAIL_BORDER_SIZE,
+			this->y_coord,
 			width < PIPE_TAIL_GRADIENT_SPLIT_X ? width : PIPE_TAIL_GRADIENT_SPLIT_X,
-			height,
+			this->height,
 			G,
 			L
 	);
     // Tail gradient rechts van de split
     _ral_draw_hz_gradient(
     		display,
-    		x_coord + PIPE_TAIL_OFFSET + PIPE_TAIL_BORDER_SIZE + PIPE_TAIL_GRADIENT_SPLIT_X,
-			y_coord,
+			this->x_coord + PIPE_TAIL_OFFSET + PIPE_TAIL_BORDER_SIZE + PIPE_TAIL_GRADIENT_SPLIT_X,
+			this->y_coord,
 			width - (PIPE_TAIL_OFFSET * 2) - (PIPE_TAIL_BORDER_SIZE * 2) - (PIPE_TAIL_GRADIENT_SPLIT_X),
-			height,
+			this->height,
 			L,
 			G
 	);
 
     // Als de pipe een upper pipe is moeten we de head onderaan de tail tekenen
     // en als het een lower pipe is moeten we de head bovenaan de tail tekenen
-    if (upper) {
+    if (this->upper) {
     	// Teken de border van het hoofd van de pipe onderaan de tail
-     	display->ral_draw_box(x_coord, y_coord + height - PIPE_HEAD_HEIGHT, width, PIPE_HEAD_HEIGHT, B, false);
+     	display->draw_box(
+     			this->x_coord,
+				this->y_coord + this->height - PIPE_HEAD_HEIGHT,
+				width,
+				PIPE_HEAD_HEIGHT,
+				B,
+				false
+		);
 
      	// Teken een gradient van de head
     	_ral_draw_hz_gradient(
     			display,
-    			x_coord + PIPE_HEAD_BORDER_SIZE,
-				y_coord + height - PIPE_HEAD_HEIGHT + PIPE_HEAD_BORDER_SIZE,
+				this->x_coord + PIPE_HEAD_BORDER_SIZE,
+				this->y_coord + this->height - PIPE_HEAD_HEIGHT + PIPE_HEAD_BORDER_SIZE,
 				width - (PIPE_HEAD_BORDER_SIZE * 2),
 				PIPE_HEAD_HEIGHT - (PIPE_HEAD_BORDER_SIZE * 2),
 				L,
@@ -96,13 +109,13 @@ void Pipe::render(RAL *display) {
 		);
     } else {
     	// Teken de border van het hoofd van de pipe bovenaan de tail
-     	display->ral_draw_box(x_coord, y_coord, width, PIPE_HEAD_HEIGHT, B, false);
+     	display->draw_box(this->x_coord, this->y_coord, width, PIPE_HEAD_HEIGHT, B, false);
 
      	// Teken een gradient van de head
     	_ral_draw_hz_gradient(
     			display,
-    			x_coord + PIPE_HEAD_BORDER_SIZE,
-				y_coord + PIPE_HEAD_BORDER_SIZE,
+				this->x_coord + PIPE_HEAD_BORDER_SIZE,
+				this->y_coord + PIPE_HEAD_BORDER_SIZE,
 				width - (PIPE_HEAD_BORDER_SIZE * 2),
 				PIPE_HEAD_HEIGHT - (PIPE_HEAD_BORDER_SIZE * 2),
 				L,
@@ -120,28 +133,28 @@ void Pipe::set_color(uint16_t color) {}
  * @inheritDoc
  **/
 uint16_t Pipe::get_width() {
-    return width;
+    return this->width;
 }
 
 /**
  * @inheritDoc
  **/
 uint16_t Pipe::get_height() {
-    return height;
+    return this->height;
 }
 
 /**
  * @inheritDoc
  **/
 uint16_t Pipe::get_x_coord() {
-    return x_coord;
+    return this->x_coord;
 }
 
 /**
  * @inheritDoc
  **/
 uint16_t Pipe::get_y_coord() {
-    return y_coord;
+    return this->y_coord;
 }
 
 /**
@@ -171,7 +184,7 @@ void Pipe::set_x_coord(uint16_t x_coord) {
 /**
  * @inheritDoc
  **/
-static void _ral_draw_hz_gradient(RAL *display, uint16_t x, uint16_t y,
+static void _ral_draw_hz_gradient(ral::display *display, uint16_t x, uint16_t y,
 		uint16_t width, uint16_t height, uint16_t start_color, uint16_t end_color) {
 
 	CHECK_INTEGER_OVERFLOW(width);
@@ -195,7 +208,7 @@ static void _ral_draw_hz_gradient(RAL *display, uint16_t x, uint16_t y,
 			b_current = b_start;
 
 	for (uint16_t i = 0; i < width; ++i) {
-		display->ral_draw_box(x + i, y, 1, height, ALT_UP_VIDEO_RESAMPLE_RGB_TO_16BIT_RGB((int)r_current, (int)g_current, (int)b_current));
+		display->draw_box(x + i, y, 1, height, ALT_UP_VIDEO_RESAMPLE_RGB_TO_16BIT_RGB((int)r_current, (int)g_current, (int)b_current));
 		r_current += r_increment;
 		g_current += g_increment;
 		b_current += b_increment;

@@ -62,7 +62,7 @@ const uint16_t FLAPPY_SPRITE[FLAPPY_SPRITE_HEIGHT][FLAPPY_SPRITE_WIDTH] = {
  * Teken een collision box om een bepaalde regio.
  **/
 #define DRAW_HITBOX(display_ptr, x, y, width, height) \
-	(display_ptr->ral_draw_box(x, y, width, height, 0xF800, false))
+	(display_ptr->draw_box(x, y, width, height, 0xF800, false))
 
 /**
  * Teken een collision box om een bepaalde regio als <b>cond</b> waar is.

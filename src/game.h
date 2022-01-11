@@ -7,9 +7,8 @@
 
 #include <list>
 
-#include "../library/ial/ial.h"
-#include "../library/ral/ral.h"
-
+#include "../library/ial/ial_device.h"
+#include "../library/ral/ral_display.h"
 #include "../src/pipe.h"
 #include "../src/flappy.h"
 #include "../src/glyph.h"
@@ -19,8 +18,8 @@
  **/
 class Game {
 private:
-    RAL *display;
-    ial *input;
+    ral::display *display;
+    ial::device *input;
 
     Flappy *flappy;
     std::list<Entity *> entities;
@@ -44,7 +43,7 @@ private:
     void create_pipe(uint16_t i);
 
 public:
-    Game(RAL *display, ial *input);
+    Game(ral::display *display, ial::device *input);
 
     /**
      * Of de bird alive is.

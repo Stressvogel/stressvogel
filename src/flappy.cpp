@@ -34,8 +34,8 @@ Flappy::~Flappy() {
 /**
  * @inheritDoc
  **/
-void Flappy::render(RAL *display) {
-    display->ral_draw_sprite(x_coord, y_coord, width, height, &sprite_buf);
+void Flappy::render(ral::display *display) {
+    display->draw_sprite(x_coord, y_coord, width, height, &sprite_buf);
 }
 
 /**
@@ -95,9 +95,9 @@ void Flappy::set_x_coord(uint16_t x_coord) {
  * @inheritDoc
  **/
 void Flappy::calc_new_velocity() {
-    float new_velocity = velocity - GRAVITY;
+    float new_velocity = this->velocity - GRAVITY;
     if (new_velocity <= MAX_SPEED) {
         new_velocity = MAX_SPEED;
     }
-    velocity = new_velocity;
+    this->velocity = new_velocity;
 }

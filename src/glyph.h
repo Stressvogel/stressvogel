@@ -80,7 +80,7 @@ public:
     /**
      * @inheritDoc
      **/
-    void render(RAL *display);
+    void render(ral::display *display);
 };
 
 #endif /* SOFTWARE_GLYPH_H_ */

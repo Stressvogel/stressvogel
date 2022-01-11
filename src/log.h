@@ -17,7 +17,7 @@
 /**
  * Switch om logging aan/uit te zetten
  **/
-//#define LOG_ENABLE // comment deze regel uit als je logging niet wilt gebruiken
+#define LOG_ENABLE // comment deze regel uit als je logging niet wilt gebruiken
 
 #ifdef LOG_ENABLE
 #define LOG_INFO(format, ...)	printf("INFO | " format "\n", ##__VA_ARGS__)
