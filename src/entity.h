@@ -5,7 +5,7 @@
 #ifndef SOFTWARE_OBJECT_H
 #define SOFTWARE_OBJECT_H
 
-#include "../library/ral/ral.h"
+#include "../library/ral/ral_display.h"
 
 /**
  * Een "entiteit" in ons speelveld, bijvoorbeeld de Flappy Bird of een pipe.<br/>
@@ -81,7 +81,7 @@ public:
     /**
      * Teken het speelveld naar een display
      **/
-    virtual void render(RAL *display) = 0;
+    virtual void render(ral::display *display) = 0;
 };
 
 #endif //SOFTWARE_OBJECT_H

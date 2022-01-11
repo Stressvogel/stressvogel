@@ -55,8 +55,8 @@ void Glyph::show_int(int new_int) {
 /**
  * @inheritDoc
  **/
-void Glyph::render(RAL *display) {
-    display->ral_draw_sprite(x_coord, y_coord, width, height, &sprite_buf);
+void Glyph::render(ral::display *display) {
+    display->draw_sprite(x_coord, y_coord, width, height, &sprite_buf);
 }
 
 /**

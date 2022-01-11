@@ -71,7 +71,7 @@
 static void fly_button_pressed_cb(bool is_pressed, void *user_data),
 			hitbox_button_pressed_cb(bool is_pressed, void *user_data);
 
-Game::Game(RAL *display, ial *input) : display(display), input(input) {
+Game::Game(ral::display *display, ial::device *input) : display(display), input(input), score(0) {
 	// Initialiseer de flappy bird en plaats hem op de startpositie
     this->flappy = new Flappy(FLAPPY_START_X, FLAPPY_START_Y);
 
@@ -81,8 +81,8 @@ Game::Game(RAL *display, ial *input) : display(display), input(input) {
     this->score = 0;
 
     // Registreer button callbacks in de IAL
-    this->input->ial_register_button_callback(FLY_BUTTON_ID, BUTTON_PRIORITY, &fly_button_pressed_cb, this);
-    this->input->ial_register_button_callback(HITBOX_BUTTON_ID, BUTTON_PRIORITY, &hitbox_button_pressed_cb, this);
+    this->input->register_button_callback(FLY_BUTTON_ID, BUTTON_PRIORITY, &fly_button_pressed_cb, this);
+    this->input->register_button_callback(HITBOX_BUTTON_ID, BUTTON_PRIORITY, &hitbox_button_pressed_cb, this);
 }
 
 /**
@@ -97,8 +97,8 @@ void Game::create_pipe() {
  * @inheritDoc
  **/
 void Game::create_pipe(uint16_t path) {
-    entities.push_back(new Pipe(true, path, display->get_width(), display->get_height()));
-    entities.push_back(new Pipe(false, path, display->get_width(), display->get_height()));
+    this->entities.push_back(new Pipe(true, path, display->get_width(), display->get_height()));
+    this->entities.push_back(new Pipe(false, path, display->get_width(), display->get_height()));
 }
 
 /**
@@ -108,7 +108,7 @@ void Game::tick() {
 	// Maak een nieuwe pipe aan als de laatste pipe X pixels bewogen is
 	if (this->last_pipe <= (display->get_width() - PIPE_INTERVAL)) {
 		this->last_pipe = display->get_width();
-		create_pipe();
+		this->create_pipe();
 	}
 	this->last_pipe += PIPE_VELOCITY;
 
@@ -179,7 +179,7 @@ void Game::render() {
 
     LOG_MEASURE(this->score_glyph->render(this->display));
 
-    LOG_MEASURE(this->display->ral_clear());
+    LOG_MEASURE(this->display->clear());
 }
 
 /**

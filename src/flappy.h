@@ -80,7 +80,7 @@ public:
     /**
      * @inheritDoc
      **/
-    void render(RAL *display);
+    void render(ral::display *display);
 
     /**
      * Bereken de nieuwe velocity.<br/>
