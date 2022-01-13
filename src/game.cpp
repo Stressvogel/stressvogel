@@ -1,16 +1,21 @@
-//
-// Created by Aran on 03/12/2021.
-//
+/*
+ * game.cpp
+ *
+ * Omschrijving:	Klasse die de game state beheert
+ * Hoofdauteur:		Aran Kieskamp
+ *
+ * Project Stressvogel
+ * Computer Engineering
+ * Windesheim, 2021-2022
+ */
+
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+#include <unistd.h>
 
 #include "game.h"
-
-#include <cstdlib>
-#include <cstdio>
-#include <unistd.h>
-#include <cmath>
-
 #include "sprite.h"
-
 #include "log.h"
 
 /**
@@ -24,7 +29,7 @@
 /**
  * De minimale stretch voordat een pipe verwijderd wordt.
  **/
-#define PIPE_MIN_STRETCH_WIDTH	5
+#define PIPE_MIN_STRETCH_WIDTH		5
 
 /**
  * Startpositie van de flappy (X-coordinaat)
@@ -37,7 +42,7 @@
 /**
  * De snelheid met waarmee de flappy omhoog gaat zodra er op de button wordt gedrukt.
  **/
-#define FLAPPY_LAUNCH_VELOCITY	10
+#define FLAPPY_LAUNCH_VELOCITY		10
 /**
  * De height waarop de score glyph gerendered wordt
  **/
@@ -62,43 +67,50 @@
 
 /**
  * Onnauwkeurige division macro
- */
-#define APPROX_DIV(num, div)	((int) floor(num / div))
+ **/
+#define APPROX_DIV(num, div)		((int) floor(num / div))
 
 /**
  * Een callback functie die wordt aangeroepen zodra er button input is.
  **/
 static void fly_button_pressed_cb(bool is_pressed, void *user_data),
-			hitbox_button_pressed_cb(bool is_pressed, void *user_data);
+	    hitbox_button_pressed_cb(bool is_pressed, void *user_data);
 
+/**
+ * Construct en initialiseer de game met de default state.
+ **/
 Game::Game(ral::display *display, ial::device *input) : display(display), input(input), score(0) {
 	// Initialiseer de flappy bird en plaats hem op de startpositie
-    this->flappy = new Flappy(FLAPPY_START_X, FLAPPY_START_Y);
+	this->flappy = new Flappy(FLAPPY_START_X, FLAPPY_START_Y);
 
-    // Initialiseer de score glyph
-    this->score_glyph = new Glyph(APPROX_DIV(display->get_width(), 2) - APPROX_DIV(GLYPH_SPRITE_WIDTH, 1), SCORE_GLYPH_Y, SCORE_GLYPH_SCALE);
-    this->score_glyph->show_int((int) 0);
-    this->score = 0;
+	// Initialiseer de score glyph
+	this->score_glyph = new Glyph(
+			APPROX_DIV(display->get_width(), 2) - APPROX_DIV(GLYPH_SPRITE_WIDTH, 1),
+			SCORE_GLYPH_Y,
+			SCORE_GLYPH_SCALE
+	);
+	this->score_glyph->show_int((int) 0);
+	this->score = 0;
 
-    // Registreer button callbacks in de IAL
-    this->input->register_button_callback(FLY_BUTTON_ID, BUTTON_PRIORITY, &fly_button_pressed_cb, this);
-    this->input->register_button_callback(HITBOX_BUTTON_ID, BUTTON_PRIORITY, &hitbox_button_pressed_cb, this);
+	// Registreer button callbacks in de IAL
+	this->input->register_button_callback(FLY_BUTTON_ID, BUTTON_PRIORITY, &fly_button_pressed_cb, this);
+	this->input->register_button_callback(HITBOX_BUTTON_ID, BUTTON_PRIORITY, &hitbox_button_pressed_cb, this);
 }
 
 /**
  * @inheritDoc
  **/
 void Game::create_pipe() {
-    uint16_t path = rand() % path_max_height + path_min_height;
-    create_pipe(path);
+	uint16_t path = rand() % path_max_height + path_min_height;
+	create_pipe(path);
 }
 
 /**
  * @inheritDoc
  **/
 void Game::create_pipe(uint16_t path) {
-    this->entities.push_back(new Pipe(true, path, display->get_width(), display->get_height()));
-    this->entities.push_back(new Pipe(false, path, display->get_width(), display->get_height()));
+	this->entities.push_back(new Pipe(true, path, display->get_width(), display->get_height()));
+	this->entities.push_back(new Pipe(false, path, display->get_width(), display->get_height()));
 }
 
 /**
@@ -118,7 +130,8 @@ void Game::tick() {
 		Entity *entity = *it;
 		uint16_t new_x_coord = entity->get_x_coord() + PIPE_VELOCITY;
 
-		// als de flappy in aanraking komt met deze pipe
+		// Voer AABB collision detection uit tussen de flappy en de pipe
+		// Stop het spel als de flappy in aanraking komt met deze pipe
 		if (flappy->get_x_coord() < entity->get_x_coord() + entity->get_width() &&
 		    flappy->get_x_coord() + flappy->get_width() > entity->get_x_coord() &&
 		    flappy->get_y_coord() < entity->get_y_coord() + entity->get_height() &&
@@ -149,48 +162,56 @@ void Game::tick() {
 
 	// Update flappy bird position and stop game if he touches the ground
 	uint16_t flappy_y = this->flappy->get_y_coord();
-    flappy_y -= flappy->velocity;
+	flappy_y -= flappy->velocity;
 
-	if ((flappy_y + this->flappy->get_height()) >= this->display->get_height()) { // TODO swapfix
+	// Check of de flappy bird buiten de speelzone is
+	if ((flappy_y + this->flappy->get_height()) >= this->display->get_height()) {
 		LOG_INFO("*insert coffin dance music here*");
 		running = false;
 		if (flappy_y > 9999) {
-			this->flappy->set_y_coord(0); // TODO swapfix
+			this->flappy->set_y_coord(0);
 		} else {
-			this->flappy->set_y_coord(this->display->get_height() - this->flappy->get_height()); // TODO swapfix
+			this->flappy->set_y_coord(this->display->get_height() - this->flappy->get_height());
 		}
 	} else {
-        this->flappy->set_y_coord(flappy_y);
-        this->flappy->calc_new_velocity();
-    }
+		this->flappy->set_y_coord(flappy_y);
+		this->flappy->calc_new_velocity();
+	}
 }
 
 /**
  * @inheritDoc
  **/
 void Game::render() {
-    LOG_MEASURE(for (Entity *entity : this->entities) {
-        entity->render(this->display);
-        DRAW_HITBOX_IF(this->show_hitboxes, this->display, entity->get_x_coord(), entity->get_y_coord(), entity->get_width(), entity->get_height());
-    });
+	// Teken alle entities
+	for (Entity *entity : this->entities) {
+		entity->render(this->display);
+		DRAW_HITBOX_IF(this->show_hitboxes, this->display, entity->get_x_coord(), entity->get_y_coord(), entity->get_width(), entity->get_height());
+	};
 
-    LOG_MEASURE(this->flappy->render(this->display));
-    DRAW_HITBOX_IF(this->show_hitboxes, this->display, flappy->get_x_coord(), flappy->get_y_coord(), flappy->get_width(), flappy->get_height());
+	// Teken de flappy bird
+	LOG_MEASURE(this->flappy->render(this->display));
+	DRAW_HITBOX_IF(this->show_hitboxes, this->display, flappy->get_x_coord(), flappy->get_y_coord(), flappy->get_width(), flappy->get_height());
 
-    LOG_MEASURE(this->score_glyph->render(this->display));
+	// Teken de huidige score
+	this->score_glyph->render(this->display);
 
-    LOG_MEASURE(this->display->clear());
+	// Clear het scherm + wacht op buffer swap
+	LOG_MEASURE(this->display->clear());
 }
 
 /**
  * @inheritDoc
  **/
 void Game::reset() {
+	// Delete alle entities uit de entity list
 	for (std::list<Entity *>::iterator it = entities.begin(); it != entities.end();) {
 		Entity *entity = *it;
 		it = entities.erase(it);
 		delete entity;
 	}
+
+	// Reset de game state
 	this->last_pipe = 0;
 	this->flappy->set_x_coord(FLAPPY_START_X);
 	this->flappy->set_y_coord(FLAPPY_START_Y);

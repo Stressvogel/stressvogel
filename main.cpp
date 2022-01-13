@@ -1,6 +1,13 @@
-//
-// Created by Aran on 30/11/2021.
-//
+/*
+ * main.cpp
+ *
+ * Omschrijving:	Het entry point en de game loop van ons programma.
+ * Hoofdauteur:		Matthijs Bakker
+ *
+ * Project Stressvogel
+ * Computer Engineering
+ * Windesheim, 2021-2022
+ */
 
 #include <chrono>
 #include <cstdio>
@@ -8,8 +15,8 @@
 
 #include "system.h"
 
-#include "library/ral/ral_display_vga.h"
 #include "src/game.h"
+#include "library/ral/ral_display_vga.h"
 
 /**
  * Switch om makkelijk te schakelen tussen een PS2 keyboard en onboard buttons
@@ -17,15 +24,10 @@
 #define USE_INPUT_PS2 // comment deze regel uit als je de onboard buttons wilt gebruiken
 
 #ifndef USE_INPUT_PS2
-
 #include "library/ial/ial_device_de2_115.h"
-
 #else
-
 #include "library/ial/ial_device_ps2.h"
-
 #endif
-
 #include "src/log.h"
 
 /**
@@ -33,33 +35,34 @@
  *
  * @param second 	Een heel aantal seconden
  **/
-#define SECONDS_TO_US(second)    (second * 1000000)
+#define SECONDS_TO_US(second)	(second * 1000000)
+
 /**
  * Macro voor het converteren van ticks per seconden naar delaytime in microseconden
  *
  * @param tps		Het aantal ticks per seconden
  **/
-#define TICKS_TO_US(tps)        ((int)(((float)(1.0f/((float)tps)))*SECONDS_TO_US(1)))
+#define TICKS_TO_US(tps)	((int)(((float)(1.0f/((float)tps)))*SECONDS_TO_US(1)))
 
 /**
  * Macro voor het omzetten van ticks per seconde naar alt_alarm ticks
  *
  * @param tps		Het aantal ticks per seconden
  **/
-#define TPS_TO_TICKS(tps)        (float)((float)((float) alt_ticks_per_second() / (float) tps))
+#define TPS_TO_TICKS(tps)	((float)((float)((float) alt_ticks_per_second() / (float) tps)))
 
 /**
  * Hoe vaak onze game per seconde updatet
  **/
-#define TPS                        8 // updates per seconde
+#define TPS			(8) // updates per seconde
 
 /**
- * Hoeveelheid alt_alarm ticks
+ * Hoeveelheid alt_alarm ticks per seconde.
  **/
-#define GAME_TICKS                TPS_TO_TICKS(TPS)
+#define GAME_TICKS		(TPS_TO_TICKS(TPS))
 
 /**
- * De tijd wanneer het computer systeem gegenereerd was
+ * Het tijdstip waarop het computer systeem gegenereerd was.
  **/
 #ifdef SYSID_TIMESTAMP // media computer
 static const time_t HARDWARE_GEN_TIME = SYSID_TIMESTAMP;
@@ -102,6 +105,9 @@ void init() {
 	LOG_INIT_MSG("Game");
 }
 
+/**
+ * Een functie om alle gametaken uit te voeren.
+ **/
 void iter() {
 	LOG_MEASURE(input->poll());
 
@@ -109,14 +115,17 @@ void iter() {
 	if (game->running) {
 		LOG_MEASURE(game->tick()); // refresh game logic
 	}
+
 	LOG_MEASURE(game->render()); // render to screen
 }
 
+/**
+ * Eindeloze loop
+ **/
 void loop() {
 	// Onze game gaat eindeloos door..... totdat iemand de stroom er uit trekt.
 	while (1) {
 		LOG_MEASURE(iter());
-		LOG_INFO("\n\n\n");
 	}
 }
 
@@ -135,8 +144,8 @@ int main() {
 	// Eindeloze loop
 	loop();
 
+	// Hier zou het programma niet eens mogen komen...
 	LOG_ERROR("Game loop is onderbroken");
-
 	return 0;
 }
 

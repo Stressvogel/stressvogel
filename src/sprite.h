@@ -1,8 +1,12 @@
 /*
  * sprite.h
  *
- *  Created on: Dec 3, 2021
- *      Author: Matthijs Bakker
+ * Omschrijving:	Kleuren en sprite data. We hadden geen tijd om deze in de ROM te zetten.
+ * Hoofdauteur:		Matthijs Bakker
+ *
+ * Project Stressvogel
+ * Computer Engineering
+ * Windesheim, 2021-2022
  */
 
 #ifndef SOFTWARE_SPRITE_H_
@@ -13,33 +17,36 @@
  * Basiskleuren
  * ------------------------------------------------------------------------- */
 
-#define T 0xDEAD // transparant, wordt niet gerendered.
-//#define B 0x0000 // zwart
-#define B 0x39C8 // zwart-grijs-achtig
-#define W 0xFFFF // wit
-#define R 0xF800 // rood
+#define T			(0xDEAD) // transparant, wordt niet gerendered.
+//#define B			(0x0000) // zwart
+#define B			(0x39C8) // zwart-grijs-achtig
+#define W			(0xFFFF) // wit
+#define R			(0xF800) // rood
 
 /* -------------------------------------------------------------------------
  * Kleuren voor de flappy bird
  * ------------------------------------------------------------------------- */
 
-#define Y 0xFF47 // geel
-#define D 0xFE00 // donkergeel
-#define O 0xFCC0 // oranje
+#define Y			(0xFF47) // geel
+#define D			(0xFE00) // donkergeel
+#define O			(0xFCC0) // oranje
 
 /* -------------------------------------------------------------------------
  * Kleuren voor de pipes
  * ------------------------------------------------------------------------- */
-#define G 0x5403
-#define L 0xB6AD
+#define G			(0x5403)
+#define L			(0xB6AD)
 
 
-#define FLAPPY_SPRITE_HEIGHT 12
-#define FLAPPY_SPRITE_WIDTH 17
+#define FLAPPY_SPRITE_HEIGHT	(12)
+#define FLAPPY_SPRITE_WIDTH	(17)
+
+#define GLYPH_SPRITE_HEIGHT	(8)
+#define GLYPH_SPRITE_WIDTH	(6)
 
 /**
- * Sprite data voor de Flappy Bird.
- *
+ * Sprite data voor de Flappy Bird.<br />
+ * <br />
  * Het is een array met een lengte van 12 met daarin
  * arrays met lengtes van 17 die de pixels bevatten.
  **/
@@ -62,20 +69,13 @@ const uint16_t FLAPPY_SPRITE[FLAPPY_SPRITE_HEIGHT][FLAPPY_SPRITE_WIDTH] = {
  * Teken een collision box om een bepaalde regio.
  **/
 #define DRAW_HITBOX(display_ptr, x, y, width, height) \
-	(display_ptr->draw_box(x, y, width, height, 0xF800, false))
+		(display_ptr->draw_box(x, y, width, height, 0xF800, false))
 
 /**
  * Teken een collision box om een bepaalde regio als <b>cond</b> waar is.
  **/
 #define DRAW_HITBOX_IF(cond, display_ptr, x, y, width, height) \
-	{if (cond) {(DRAW_HITBOX(display_ptr, x, y, width, height));}}
-
-#define GLYPH_SPRITE_HEIGHT 8
-#define GLYPH_SPRITE_WIDTH 6
-
-/**
- * Dit heet "ROM" toch?.. *thinking emoji* ... *laughing emoji*
- **/
+		{if (cond) {(DRAW_HITBOX(display_ptr, x, y, width, height));}}
 
 const uint16_t GLYPH_0_SPRITE[GLYPH_SPRITE_HEIGHT][GLYPH_SPRITE_WIDTH] = {
 		{B, B, B, B, B, T},
@@ -190,3 +190,4 @@ const uint16_t GLYPH_9_SPRITE[GLYPH_SPRITE_HEIGHT][GLYPH_SPRITE_WIDTH] = {
 };
 
 #endif /* SOFTWARE_SPRITE_H_ */
+
